@@ -22,6 +22,7 @@ Status: plan, v1 scope. Nothing is built yet.
 | Reminders | Through the system Calendar app (.ics), no push server |
 | Keeping it tidy | Stale tasks auto-decay, "just one thing" Now view, guided weekly review |
 | Visual style | Apple "Liquid Glass": translucent layered material, large type, motion |
+| Motivation | **Pace**, a workload metric like a fitness training load, replaces streaks |
 
 ## Why todo apps get abandoned, and what we do about each cause
 
@@ -100,6 +101,73 @@ score = energyFit*3 + timeFit*2 + projectMomentum + ageNudge − skipPenalty
 - `ageNudge`: older Next tasks rise slowly, until the decay limit
 - `skipPenalty`: skipped today, so show it later
 
+## Pace: workload instead of streaks
+
+Streaks punish a single missed day, and that is a common moment for people to quit an app. Pace works like a training load in fitness apps: it rewards steady effort over weeks, and warns when you push much harder than you're used to.
+
+### Name
+
+**Pace**. It covers both halves of the idea: keep a steady pace, and don't run faster than you can sustain. It's short enough for a tab label and a widget ("Your Pace: Steady").
+
+Alternatives considered: *Momentum* (only says "keep going", misses the burnout side), *Effort Load* (accurate but clinical), *Ember* (steady glow vs burning out; nice metaphor, less clear), *Rhythm* (good, but vaguer).
+
+### Measuring effort
+
+Each completed task gives **effort points**:
+
+```
+effort = minutes × intensity      intensity: low 1 · medium 2 · high 3
+```
+
+This mirrors how sports science scores a training session (duration × intensity).
+
+- Minutes and energy come from the task's estimate, so you have nothing extra to enter.
+- When you finish a task, a small chip shows the guess (`~30m · high · 90 pts`). Tap to correct it, or ignore it. A correction also improves future estimates.
+- **Day effort** is the sum of the day's completed tasks.
+
+### The two numbers
+
+| Number | What it is | How it feels |
+|---|---|---|
+| **Base** | Average daily effort over the last 28 days | Your fitness: what you can normally sustain. Moves slowly |
+| **Recent** | Average daily effort over the last 7 days | Your fatigue: what you've been doing lately. Moves fast |
+
+**Pace = Recent ÷ Base.** This is the acute:chronic workload ratio used in sports science to spot people ramping up too quickly.
+
+| Pace | Zone | Message |
+|---|---|---|
+| below 0.8 | **Easing off** | "Lighter week than usual." Neutral, never scolding. Rest is allowed |
+| 0.8 – 1.3 | **Steady** | "You're in your sustainable range." The goal zone |
+| 1.3 – 1.5 | **Stretching** | "Above your usual load. Fine for a sprint, plan some recovery." |
+| above 1.5 | **Overreaching** | "Well above your usual load. This is where burnout risk rises." |
+
+Burnout warnings get stronger when signs add up, not from a single busy day:
+
+- Pace is in **Stretching** or **Overreaching** for 10+ days in a row
+- **No light day** in the last 14 days. A light day is under 30% of Base
+- **Lots of high-energy work:** high-intensity task time above about 4 hours on most days of the week. Research on deliberate practice suggests people sustain only about 4 hours of deeply demanding work per day
+- **Long weeks:** estimated task time above about 50 hours a week. Studies of working hours find output per hour drops sharply past about 50, and health risks rise from 55
+
+The message names the signals it saw, for example: "3 weeks above your usual load and no light day in 16 days."
+
+### What "the graph stays up" means
+
+Because Base is a 28-day average, working steadily keeps it level. One day off barely lowers it, and a week off lowers it gently. That rewards consistency without the "you broke your streak" moment.
+
+### Graphs
+
+- **Day:** effort by hour, with bars coloured by energy level (blue, teal, amber). Today's total is compared with your Base.
+- **Week:** a bar for each day, with your Base as a horizontal reference line.
+- **Month:** daily bars plus two lines, Recent and Base. A shaded band shows the Steady zone (0.8–1.3 × Base), so you can see when you left it.
+- **Now screen:** a small glass ring shows today's effort against your Base, with the zone word underneath. Tap it to open the graphs.
+
+### Honest limits
+
+- **Calibrating:** for the first 14 days the app shows only your effort, with no zone, because Base isn't meaningful yet.
+- **Only what's in the app:** effort counts only tasks you track. Work that isn't in the app is invisible, and the screen says so.
+- **Not a medical measure:** the 0.8–1.3 and 1.5 thresholds come from athletes' training loads. Applying them to mental work is a reasoned analogy, not a validated test. Zones are framed as "risk is rising", never as a burnout percentage or diagnosis.
+- **Adjustable:** you can change the thresholds in Settings, or hide Pace entirely.
+
 ## Calendar integration (within PWA limits)
 
 A PWA can't read or write the iOS calendar directly. Instead:
@@ -123,6 +191,9 @@ Task {
 Project { id, name, status: 'active'|'someday'|'done', createdAt }
 Settings { energyCurve[24], decayDays: 21, reviewDay, lastReviewAt, lastExportAt }
 EstimateStats { keyword, medianMin, count, energyVotes }
+// Task also stores effortPts and effortSource: 'auto'|'user' when done
+DayLoad { date, effortPts, highIntensityMin, totalMin, tasksDone }  // cached rollup; Recent/Base computed from it
+PaceSettings { enabled: true, steadyLow: 0.8, steadyHigh: 1.3, overreach: 1.5, calibrationDays: 14 }
 ```
 
 Export is a single versioned JSON file shared through `navigator.share` (Save to Files / iCloud Drive). Import merges by `id`, keeping the newer `updatedAt`. Call `navigator.storage.persist()` on first run so iOS is less likely to evict the data.
@@ -149,7 +220,8 @@ Export is a single versioned JSON file shared through `navigator.share` (Save to
 3. **M3 Smart capture:** inline syntax parser, rule-based estimator, clarify card stack
 4. **M4 GTD:** Projects, Waiting, Someday, defer dates, contexts
 5. **M5 Keeping it tidy:** auto-decay, weekly review flow, export/import, `.ics`
-6. **M6 Learning:** estimate history, energy curve suggestions, polish and accessibility
+6. **M6 Pace:** effort points, Recent/Base/Pace zones, burnout signals, day/week/month graphs, Now ring
+7. **M7 Learning:** estimate history, energy curve suggestions, polish and accessibility
 
 ## Open questions
 
@@ -157,3 +229,5 @@ Export is a single versioned JSON file shared through `navigator.share` (Save to
 2. Recurring tasks (e.g. "water plants every Sun"): v1 or later?
 3. Should Now be able to suggest a short break or rest at low energy when nothing fits?
 4. App name: "Flow" is a placeholder.
+5. Pace: should trashed or dropped tasks count as small effort (deciding is work too), or nothing?
+6. Pace: add an optional one-tap "How drained do you feel?" check at the end of the day? It would sharpen the burnout signal but adds a little friction.
