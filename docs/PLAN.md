@@ -45,7 +45,9 @@ Bottom tab bar, three tabs plus a capture button:
 1. **Now** (home)
    - Energy pill at the top: `🔋 Medium · evening`. Tap it to choose Low / Medium / High.
    - Optional time chip: "I have 10m / 30m / 1h+".
-   - One large accent-filled card with the best matching task; the next few follow below it, fading out. Swipe right = done, swipe left = skip and show the next one, long-press = edit.
+   - **The Now deck:** a stack of suggestion cards. The top card is the best task for your energy and time, filled with the accent; the next two peek out behind it. Swipe right = done, swipe left = not now and bring up the next one, tap = open the card's actions. Full interaction spec in [`DESIGN.md`](DESIGN.md#the-now-deck).
+   - Each card says why it was picked, in one line ("Fits low energy · 5 min · keeps *Website* moving").
+   - A task skipped three times in a week asks once: "Too big? Split it · Someday · Keep". In GTD terms a task you keep skipping usually isn't a concrete next action yet.
    - A small "show list" link expands to the top 5 matches.
    - **When nothing fits your energy** (see "Low energy and breaks" below): suggest the lowest-energy task available, or a short break.
 2. **Inbox**

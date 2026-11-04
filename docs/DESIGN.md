@@ -68,8 +68,8 @@ Rules:
 | Open capture | Yellow button stretches into the input bar; keyboard follows | Capture comes from that button |
 | Save a task | Text shrinks into a chip that drops into the Inbox tab; tab count ticks up | Where it went |
 | Inline syntax (`!low`, `#home`) | The token pops into a chip as you finish typing it | It was understood |
-| Complete (swipe right or tap) | Checkbox draws its tick, card slides off right, list closes the gap, Pace ring advances | Done, and it counted |
-| Skip (swipe left) | Card slides left and tucks under the stack; next card rises and fills with yellow | Not gone, just later |
+| Complete and skip on the Now deck | See [The Now deck](#the-now-deck) | Done, or just later |
+| Complete in a list | Checkbox draws its tick, row slides off right, list closes the gap, Pace ring advances | Done, and it counted |
 | Undo (toast button) | The reverse of the last motion | Exactly undone |
 | Change energy | Bars fill or empty one by one; the Now list reshuffles with cards moving to their new places | Energy changed what's shown |
 | Clarify card stack | Card follows the finger; a label (Next / Someday / Trash) fades in by direction; releases into its list | Where it will go |
@@ -83,6 +83,81 @@ Rules:
 | Export backup | Icon arcs upward, then becomes a check | Saved |
 
 Short system haptics (`navigator.vibrate`) accompany done, skip and errors where the device supports them. iOS Safari ignores it, so motion carries the feedback alone.
+
+## The Now deck
+
+The heart of the app: one suggestion at a time, as a stack of cards you can flick through. It should feel physical, quick and a little satisfying, like dealing cards.
+
+### Layout
+
+```
+        ┌───────────────────────────┐
+        │ ▮▮▯ Medium energy · ~20m  │   ← label (on-accent)
+        │                           │
+        │ Draft the project brief   │   ← title, 22/400
+        │                           │
+        │ Fits your energy · keeps  │   ← why it was picked, meta
+        │ Website moving            │
+        └───────────────────────────┘     top card: accent fill
+         └─────────────────────────┘      2nd: surface-2, scale 0.95, 10px lower
+           └─────────────────────┘        3rd: surface-2, scale 0.90, 20px lower, 50% opacity
+
+          ✕ Not now          ✓ Done      ← buttons, same actions as swiping
+```
+
+- The top card is about 60% of screen height and centred where the thumb rests.
+- At most **7 cards** in one pass. After that: "That's the best of what fits. Show the full list?" This avoids endless flicking, which is a way of avoiding work.
+
+### Gestures
+
+| Gesture | Action | What you see |
+|---|---|---|
+| Swipe right | **Done** | Card follows the finger and tilts up to 8°. A "Done ✓" stamp fades in on the card. On release, the tick draws, the card flies off right, the Pace ring advances |
+| Swipe left | **Not now** | A "Next" stamp fades in. On release, the card flies off left and the next card rises into place, filling with the accent |
+| Tap | **Actions** | The card flips over (180 ms) to show: Start timer · Defer · Someday · Edit · Split |
+| Long-press | **Edit** | The card lifts slightly (scale 1.03) and the edit sheet rises |
+| Pull down on the deck | **Reshuffle** | The deck re-ranks, for example after your energy changed |
+
+How the drag feels:
+
+- The card tracks the finger 1:1 with no lag, rotating around a point below the card, so it swings like a held card.
+- **Live preview:** as the top card moves away, the card behind grows from 0.95 to 1.0 and starts taking on the accent, so you see what's next before you let go.
+- **Commit threshold:** 35% of the screen width, or a quick flick (over 0.5 px/ms) at any distance.
+- **Below the threshold**, the card springs back to centre with a slight overshoot.
+- **Fly-off** follows the release speed and direction, so a fast flick leaves fast.
+- The next card is ready on the frame the top card leaves. There is never an empty moment.
+
+### After a swipe
+
+- **Undo** for 4 seconds: a small toast at the bottom ("Done · Undo"). Undo flies the card back onto the deck.
+- **Not now** means later today: a skipped card returns at the bottom of the deck after other suggestions, and is ranked lower for the rest of the day.
+- **Skipped three times in a week:** the next time it appears, the back of the card shows "Too big? Split it · Someday · Keep" instead of going straight to the next card.
+
+### Start timer
+
+"Start" on the back of the card turns the card into a focus view:
+
+- The card grows to fill the screen; the title stays, a thin accent line slowly runs down as time passes against the estimate.
+- "Done" or swipe right finishes it. The real time is saved, which makes future estimates better.
+- Leaving the app keeps the timer running; it's based on the start time, not a background process.
+
+### When the deck runs out
+
+- The last card leaves and the **lowest-energy task** rises in its place, marked "Light option".
+- If there's none, a **break card** rises instead, using the same swipe rules: right to start the break, left for another idea.
+- If there's nothing at all: "All clear for your energy right now." with one quiet button, "Show everything".
+
+### Accessibility
+
+- The ✕ and ✓ buttons below the deck do everything the swipes do, so no gesture is ever required.
+- VoiceOver reads the card as "Draft the project brief, medium energy, about 20 minutes. Actions: Done, Not now, More". The swipe actions are available from the rotor.
+- With reduced motion, cards crossfade in place with no tilt or flying.
+
+### Engineering notes
+
+- Drag uses Pointer Events and a CSS `transform` updated in `requestAnimationFrame`, never layout properties.
+- Only the top three cards are in the DOM; the rest are data.
+- Card springs use a small spring function (a few lines, no animation library), so input never waits on JavaScript beyond the next frame.
 
 ## Speed budget
 
@@ -100,7 +175,7 @@ How: Preact with signals (small, fine-grained updates), all data read into memor
 
 ## Components
 
-`Surface`, `Card` (focused yellow and normal), `TaskRow`, `SwipeRow`, `Chip`, `EnergyBars`, `EnergyPill`, `TabBar`, `CaptureButton`, `Sheet`, `CardStack`, `Ring`, `BarChart`, `LineBand`, `Toast`, `Button` (primary yellow pill and quiet), `TextField`, `SegmentedControl`, `Toggle`, `RepeatControl`, `BreakCard` (with timer), `DayCheckIn`.
+`Surface`, `Card` (focused yellow and normal), `NowDeck` (stack, gestures, flip, focus timer), `TaskRow`, `SwipeRow`, `Chip`, `EnergyBars`, `EnergyPill`, `TabBar`, `CaptureButton`, `Sheet`, `CardStack`, `Ring`, `BarChart`, `LineBand`, `Toast`, `Button` (primary yellow pill and quiet), `TextField`, `SegmentedControl`, `Toggle`, `RepeatControl`, `BreakCard` (with timer), `DayCheckIn`.
 
 A development-only `/design` page shows every component in every state and energy level, and is used for visual and speed checks.
 
