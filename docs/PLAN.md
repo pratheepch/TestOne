@@ -21,7 +21,7 @@ Status: plan, v1 scope. Nothing is built yet.
 | Time estimates | The app estimates them automatically, and learns from you |
 | Reminders | Through the system Calendar app (.ics), no push server |
 | Keeping it tidy | Stale tasks auto-decay, "just one thing" Now view, guided weekly review |
-| Visual style | Apple "Liquid Glass": translucent layered material, large type, motion |
+| Visual style | Minimal dark: near-black surfaces, one yellow accent, a micro-animation on every interaction, no perceptible delay |
 | Motivation | **Pace**, a workload metric like a fitness training load, replaces streaks |
 
 ## Why todo apps get abandoned, and what we do about each cause
@@ -37,12 +37,12 @@ Status: plan, v1 scope. Nothing is built yet.
 
 ## Screens
 
-Bottom tab bar (glass), three tabs plus a capture button:
+Bottom tab bar, three tabs plus a capture button:
 
 1. **Now** (home)
    - Energy pill at the top: `🔋 Medium · evening`. Tap it to choose Low / Medium / High.
    - Optional time chip: "I have 10m / 30m / 1h+".
-   - One large glass card with the best matching task. Swipe right = done, swipe left = skip and show the next one, long-press = edit.
+   - One large accent-filled card with the best matching task; the next few follow below it, fading out. Swipe right = done, swipe left = skip and show the next one, long-press = edit.
    - A small "show list" link expands to the top 5 matches.
 2. **Inbox**
    - Unclarified captures. Clarify with a swipe-through card stack: *Next action? → Project? → Waiting on someone? → Someday? → Trash.*
@@ -79,12 +79,14 @@ Tokens show as chips while you type, so the syntax can be learned by seeing it, 
 - **Learning (light).** Record the energy level when each task is done. Every week, nudge the curve toward when you actually finish high-energy work. Settings shows this as "Your curve has shifted"; you can accept or ignore it.
 - **Matching.** Low energy shows low tasks only. Medium shows low and medium. High shows everything, with high tasks first.
 
-## Automatic time and energy estimates (on-device, no AI service)
+## Automatic time and energy estimates (on-device AI, no cloud)
 
-Local-only rules out cloud AI, so estimates come in two layers:
+Local-only rules out cloud AI. Estimates come in two layers that run entirely on the phone:
 
 1. **Rules.** A keyword table: verbs and nouns map to an estimate and an energy level. For example, "call/text/email/pay" → 5m, low. "write/design/plan/draft" → 1h+, high. "clean/organize" → 30m, medium. Context words such as "phone" or "buy" also suggest `@phone` or `@errand`.
-2. **Learning.** When a task is done, record the actual time from first "start" to done (when tracked) or the user's correction. Similar tasks (shared keywords or project) then use that history: a per-keyword running median.
+2. **Small on-device model.** A sentence-embedding model (`all-MiniLM-L6-v2` or similar, ~23 MB compressed) runs in the browser through Transformers.js (WebAssembly). Each task title becomes a vector; the app finds the most similar past tasks (your own completed and corrected tasks, plus ~500 built-in labelled examples) and uses their time, energy and context. It understands meaning ("ring the plumber" ≈ "call dentist") and gets more personal with every task you finish or correct, with no training step. The model downloads once after install, in the background; the rules cover the gap and act as a fallback.
+
+The same vectors can suggest a project for Inbox items and spot duplicates. A generative model (200–400 MB) is not worth its download and memory cost in a web app. If generative features are wanted later, a native iOS app could use Apple's built-in on-device model with no download.
 
 Estimates appear as soft chips (`~5m`, `low`) that can be changed with one tap. A correction teaches the model.
 
@@ -156,10 +158,10 @@ Because Base is a 28-day average, working steadily keeps it level. One day off b
 
 ### Graphs
 
-- **Day:** effort by hour, with bars coloured by energy level (blue, teal, amber). Today's total is compared with your Base.
+- **Day:** effort by hour, with bar brightness showing energy level (dim = low, full accent = high). Today's total is compared with your Base.
 - **Week:** a bar for each day, with your Base as a horizontal reference line.
 - **Month:** daily bars plus two lines, Recent and Base. A shaded band shows the Steady zone (0.8–1.3 × Base), so you can see when you left it.
-- **Now screen:** a small glass ring shows today's effort against your Base, with the zone word underneath. Tap it to open the graphs.
+- **Now screen:** a small accent ring shows today's effort against your Base, with the zone word underneath. Tap it to open the graphs.
 
 ### Honest limits
 
@@ -198,30 +200,126 @@ PaceSettings { enabled: true, steadyLow: 0.8, steadyHigh: 1.3, overreach: 1.5, c
 
 Export is a single versioned JSON file shared through `navigator.share` (Save to Files / iCloud Drive). Import merges by `id`, keeping the newer `updatedAt`. Call `navigator.storage.persist()` on first run so iOS is less likely to evict the data.
 
-## Visual design: Liquid Glass
+## Design system: minimal dark, one accent
 
-- Layered translucent surfaces: `backdrop-filter: blur(24px) saturate(180%)`, a thin inner highlight border, soft shadows. A slowly drifting colour field behind the glass.
-- The background colour follows energy: cool blue for low, teal for medium, warm amber for high, so you can see your current state at a glance.
-- SF Pro via the `-apple-system` font stack, large titles, generous touch targets (≥44pt), safe-area insets.
-- Spring physics for swipes, a short haptic-style "settle" when a card leaves.
-- Light and dark themes; `prefers-reduced-transparency` and `prefers-reduced-motion` fall back to solid surfaces and no motion.
+Reference: a dark todo UI screenshot shared in the planning chat. It shows a black page, near-black rounded cards, and one bright yellow used only for the focused item and the main action. We take its style (palette, type, spacing, shape), not its exact layout or branding.
+
+### Principles
+
+1. **Dark and quiet.** Almost everything is black or near-black. Content is the only thing that stands out.
+2. **One accent, used sparingly.** Yellow marks *the one thing that matters right now*: the Now card, the capture button, today's Pace ring. If everything is yellow, nothing is.
+3. **Depth through fading, not decoration.** No gradients, blur or heavy shadows. Items further from focus are dimmer.
+4. **Every interaction answers back.** Each tap, swipe and state change has a short animation that shows what happened.
+5. **Never wait.** The UI updates on the same frame as the input; saving happens after.
+
+### Tokens
+
+Colour (sampled from the reference):
+
+| Token | Value | Use |
+|---|---|---|
+| `bg` | `#000000` | Page |
+| `surface-1` | `#0E0E0E` | Containers, tab bar, sheets |
+| `surface-2` | `#181818` | Cards, list rows |
+| `surface-3` | `#232323` | Pressed state, chips, inputs |
+| `border` | `#FFFFFF0F` (6% white) | 1px edge on surfaces |
+| `text-1` | `#FFFFFF` at 92% | Titles |
+| `text-2` | `#FFFFFF` at 55% | Metadata (time, date, counts) |
+| `text-3` | `#FFFFFF` at 30% | Disabled, faded upcoming items |
+| `accent` | `#FFF336` | The single accent |
+| `on-accent` | `#0A0A0A` | Text and icons on yellow |
+| `accent-dim` | `#FFF336` at 60% | Labels on dark ("High energy") |
+
+**Energy without extra colours.** With one accent, energy is shown by *amount*, not hue: one, two or three small bars (▮▯▯ / ▮▮▯ / ▮▮▮) in `accent-dim`, and a label like `Low energy · ~5m` in the slot where the reference shows "High Priority".
+
+**Pace zones without warning red.** Zones use the accent's strength plus wording. *Steady* is solid accent; *Easing off* is dimmed; *Stretching* and *Overreaching* use a diagonal-striped accent pattern and a plain-language message. That keeps one accent and still works for colour-blind users.
+
+Type: the system font stack (`-apple-system`, SF Pro) — close to the reference's clean grotesk, and nothing to download.
+
+| Token | Size / weight | Use |
+|---|---|---|
+| `display` | 34 / 600 | Screen titles |
+| `title` | 22 / 400 | Task title on cards (regular weight, as in the reference) |
+| `body` | 17 / 400 | Lists, inputs |
+| `meta` | 13 / 400 | Time, date, counts |
+| `label` | 11 / 600, +2% tracking | Energy label, section headers |
+
+Sizes follow the system text-size setting (Dynamic Type) and scale up to 200%.
+
+Spacing (4-pt grid): `4 · 8 · 12 · 16 · 20 · 24 · 32`. Card padding 20, gap between cards 8, screen side margin 16.
+
+Shape: radius `12` for cards and chips, `24` for containers and sheets, `999` (pill) for buttons, the tab bar and the energy pill. Icons are 1.5px outline, 16 and 20 px.
+
+Touch targets are at least 44 × 44 pt. Contrast is at least 4.5:1 for text, which `text-2` on `surface-2` meets.
+
+### Motion: a micro-animation for every interaction
+
+Rules:
+
+- **Fast.** 120–240 ms, never longer than 300 ms. Spring curves for anything you drag, `ease-out` for everything else.
+- **Never blocks input.** Every animation can be interrupted; you can tap the next thing while the last one finishes.
+- **Only `transform` and `opacity`**, so they run on the GPU at 60–120 fps.
+- **Meaningful.** Each one shows where something went or what changed. No decorative loops.
+- **Reduced motion.** When the system setting is on, movements become 100 ms crossfades.
+
+| Interaction | Animation | Meaning |
+|---|---|---|
+| Press anything | Scales to 0.97 on touch, springs back on release | "I felt your tap" |
+| Open capture | Yellow button stretches into the input bar; keyboard follows | Capture comes from that button |
+| Save a task | Text shrinks into a chip that drops into the Inbox tab; tab count ticks up | Where it went |
+| Inline syntax (`!low`, `#home`) | The token pops into a chip as you finish typing it | It was understood |
+| Complete (swipe right or tap) | Checkbox draws its tick, card slides off right, list closes the gap, Pace ring advances | Done, and it counted |
+| Skip (swipe left) | Card slides left and tucks under the stack; next card rises and fills with yellow | Not gone, just later |
+| Undo (toast button) | The reverse of the last motion | Exactly undone |
+| Change energy | Bars fill or empty one by one; the Now list reshuffles with cards moving to their new places | Energy changed what's shown |
+| Clarify card stack | Card follows the finger; a label (Next / Someday / Trash) fades in by direction; releases into its list | Where it will go |
+| Switch tab | Accent dot slides under the new tab; content crossfades with an 8px shift | Where you are |
+| Open a sheet | Rises with a spring; background dims to 60% | A layer on top |
+| Pace ring and graphs | Ring and bars grow from zero on open; numbers count up | Your effort adds up |
+| Auto-decay (on open) | A quiet "3 tasks moved to Someday" pill slides in, then out | The app tidied, nothing lost |
+| Export backup | Icon arcs upward, then becomes a check | Saved |
+
+Short system haptics (`navigator.vibrate`) accompany done, skip and errors where the device supports them. iOS Safari ignores it, so motion carries the feedback alone.
+
+### Speed budget
+
+"Fast without delay" is a testable requirement:
+
+| Measure | Target |
+|---|---|
+| Response to input | Next frame (< 16 ms) for visual feedback; < 100 ms for the full update (INP) |
+| Cold start (installed app) | < 1 s to an interactive Now screen |
+| Initial JavaScript | < 60 KB gzipped; the AI model and charts load later |
+| Data writes | Update in memory first, write to IndexedDB in the background, never wait for it |
+| Lists | Render only visible rows when a list passes 100 items |
+
+How: Preact with signals (small, fine-grained updates), all data read into memory at start, a service worker that serves the app shell from cache, and no web fonts. Milestone 1 includes a Playwright test that fails if these budgets are broken.
+
+### Components
+
+`Surface`, `Card` (focused yellow and normal), `TaskRow`, `SwipeRow`, `Chip`, `EnergyBars`, `EnergyPill`, `TabBar`, `CaptureButton`, `Sheet`, `CardStack`, `Ring`, `BarChart`, `LineBand`, `Toast`, `Button` (primary yellow pill and quiet), `TextField`, `SegmentedControl`, `Toggle`.
+
+A development-only `/design` page shows every component in every state and energy level, and is used for visual and speed checks.
+
+Dark is the default. A light theme is not planned for v1, but every colour is a token, so one could be added later.
 
 ## Tech stack
 
-- Vite + TypeScript + Preact (small, fast on mobile)
+- Vite + TypeScript + Preact with signals (small, fast on mobile)
+- Transformers.js for the on-device embedding model, loaded lazily
 - `idb` for IndexedDB, `vite-plugin-pwa` for the service worker and manifest
 - No backend, no analytics
 - Vitest for the parser, estimator and scoring; Playwright for mobile-viewport flows
 
 ## Build milestones
 
-1. **M1 Core loop:** capture, Inbox, Next, Done, IndexedDB, PWA install, glass shell
+1. **M1 Core loop:** capture, Inbox, Next, Done, IndexedDB, PWA install, design tokens and core components
 2. **M2 Energy:** curve onboarding, energy pill, Now card with swipe
 3. **M3 Smart capture:** inline syntax parser, rule-based estimator, clarify card stack
 4. **M4 GTD:** Projects, Waiting, Someday, defer dates, contexts
 5. **M5 Keeping it tidy:** auto-decay, weekly review flow, export/import, `.ics`
 6. **M6 Pace:** effort points, Recent/Base/Pace zones, burnout signals, day/week/month graphs, Now ring
-7. **M7 Learning:** estimate history, energy curve suggestions, polish and accessibility
+7. **M7 Learning:** on-device embedding model for estimates, energy curve suggestions, polish and accessibility
 
 ## Open questions
 
