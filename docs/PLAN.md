@@ -1,6 +1,6 @@
 # TodoFlow — a GTD todo app that follows your energy
 
-Status: plan, v1 scope. Nothing is built yet.
+Status: **v0.1 built** (see "What's built" at the end). Cloud sync comes next; the data layer is ready for it ([`SYNC.md`](SYNC.md)).
 
 ## Goals
 
@@ -298,3 +298,25 @@ The visual design, motion and speed budget live in [`DESIGN.md`](DESIGN.md): min
 4. Name: **TodoFlow**.
 5. Dropped tasks earn no effort points.
 6. End of day: an optional "How was your day?" check-in that never shames, including on days with no tasks done.
+
+## What's built (v0.1)
+
+Everything in milestones M1–M6, plus parts of M7:
+
+- Capture with live chips, Inbox, clarify card stack, Next / Waiting / Someday / Projects / Done lists, edit sheet
+- The Now deck: swipe, flip for actions, undo, 7-card pass limit, split prompt after repeated skips, focus timer, light option, break cards, "all clear"
+- Energy curve (onboarding + editor), 2-hour override, time chips, easy mornings after a rough day
+- Repeats (daily, weekdays, weekly days, monthly), schedule-based, never piling up
+- Weekly review (Inbox, Gone quiet, Next & Waiting, Projects, Someday, Backup), review link from Calendar
+- Pace: effort points, Recent / Base / Pace zones, burnout signals, day / week / month graphs, Now ring
+- End-of-day check-in that never shames
+- Export / import (merge), `.ics` for the weekly review and for single tasks
+- Estimates from keyword rules plus your own history (similar finished or corrected tasks)
+
+Not yet built:
+
+- **On-device embedding model** for estimates. The estimator has the same interface, but uses word similarity for now. The model host (Hugging Face) couldn't be reached from the build environment, so this needs testing on a real device before shipping
+- Energy-curve learning ("Your curve has shifted") from when you actually finish high-energy work
+- Pull-down to reshuffle the deck (the deck already re-ranks itself when energy or time changes)
+- Cloud sync (next version)
+
