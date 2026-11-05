@@ -2,7 +2,7 @@
 
 Minimal dark, one accent. This is the source of truth for colour, type, spacing, shape, motion and speed. The product plan is in [`PLAN.md`](PLAN.md).
 
-Reference: a dark todo UI screenshot shared in the planning chat. It shows a black page, near-black rounded cards, and one bright yellow used only for the focused item and the main action. We take its style (palette, type, spacing, shape), not its exact layout or branding.
+Source: the **Companion Dark** design system (https://claude.ai/artifact/MqCgRQzJKAQja4yqR8Mnut). TodoFlow uses its tokens, type, shapes, depth and components. Its 3D avatar is for an AI assistant, which TodoFlow doesn't have, so the avatar, `AvatarStage`, `Message` and `PromptBar`-as-chat are not used.
 
 ## Principles
 
@@ -14,43 +14,52 @@ Reference: a dark todo UI screenshot shared in the planning chat. It shows a bla
 
 ## Tokens
 
-Colour (sampled from the reference):
+All values come from Companion Dark's `tokens.json` and live as CSS custom properties in `src/styles/app.css`.
 
-| Token | Value | Use |
+Colour:
+
+| Token | Value | Use in TodoFlow |
 |---|---|---|
-| `bg` | `#000000` | Page |
-| `surface-1` | `#0E0E0E` | Containers, tab bar, sheets |
-| `surface-2` | `#181818` | Cards, list rows |
-| `surface-3` | `#232323` | Pressed state, chips, inputs |
-| `border` | `#FFFFFF0F` (6% white) | 1px edge on surfaces |
-| `text-1` | `#FFFFFF` at 92% | Titles |
-| `text-2` | `#FFFFFF` at 55% | Metadata (time, date, counts) |
-| `text-3` | `#FFFFFF` at 30% | Disabled, faded upcoming items |
-| `accent` | `#FFF336` | The single accent |
-| `on-accent` | `#0A0A0A` | Text and icons on yellow |
-| `accent-dim` | `#FFF336` at 60% | Labels on dark ("High energy") |
+| `ground` | `#09090a` | Page background |
+| `surface` | `#141416` | Sheets, disabled controls |
+| `surface-raised` | `#1c1c1f` | Cards, list rows, chips, inputs, settings rows |
+| `surface-high` | `#2a2a2e` | Selected dock item, icon buttons, toast, card-back actions |
+| `surface-glass` | `#1c1c1fc7` | The dock and the Now top bar, always with a 20px backdrop blur |
+| `line` / `line-strong` | `#ffffff14` / `#75757c` | Hairlines / control borders (checkbox ring, toggle) |
+| `ink` / `ink-muted` / `ink-faint` | `#f4f4ef` / `#a8a8a2` / `#8e8e88` | Text, secondary text, placeholders (`ink-faint` never on `surface-high`) |
+| `accent` | `#fff133` | The one loud thing: the top Now card, the add button, the Pace ring, focus rings |
+| `accent-soft` | `#fff1331f` | Energy pill and calm status pills, text on it stays `accent` |
+| `on-accent` / `on-accent-muted` | `#0b0b08` / `#47440f` | Text on yellow / secondary text on yellow |
+| `danger` | `#ff9a5c` | Delete actions, always with an icon or word |
+| `success` | `#7cc8ff` | The tick in the "Done" toast. Blue, so it never relies on red vs green |
 
-**Energy without extra colours.** With one accent, energy is shown by *amount*, not hue: one, two or three small bars (▮▯▯ / ▮▮▯ / ▮▮▮) in `accent-dim`, and a label like `Low energy · ~5m` in the slot where the reference shows "High Priority".
+**Energy without extra colours.** One, two or three small bars in `accent` plus a label like `Low energy · ~5m` in the TaskCard's eyebrow slot.
 
-**Pace zones without warning red.** Zones use the accent's strength plus wording. *Steady* is solid accent; *Easing off* is dimmed; *Stretching* and *Overreaching* use a diagonal-striped accent pattern and a plain-language message. That keeps one accent and still works for colour-blind users.
+**Pace zones without warning red.** StatusPills: *Steady* is solid `accent`, *Easing off* and *Calibrating* are `accent-soft`, *Stretching* and *Overreaching* are striped `accent`, each with words.
 
-Type: the system font stack (`-apple-system`, SF Pro) — close to the reference's clean grotesk, and nothing to download.
+Type: **Instrument Sans** (variable, 400–700), bundled with the app from `@fontsource-variable/instrument-sans` instead of Google Fonts, so it works offline. The Latin subset is 30 KB and is cached by the service worker.
 
-| Token | Size / weight | Use |
+| Token | Size / line / weight | Use |
 |---|---|---|
-| `display` | 34 / 600 | Screen titles |
-| `title` | 22 / 400 | Task title on cards (regular weight, as in the reference) |
-| `body` | 17 / 400 | Lists, inputs |
-| `meta` | 13 / 400 | Time, date, counts |
-| `label` | 11 / 600, +2% tracking | Energy label, section headers |
+| `numeral` | 56 / 56 / 600, tabular | Today's points on Pace, the focus timer |
+| `display` | 36 / 40 / 600 | Screen titles, onboarding headline (one per screen) |
+| `title` | 24 / 30 / 500 | Task titles on cards, sheet titles |
+| `heading` | 18 / 24 / 600 | Section headings |
+| `body` | 16 / 24 / 400 | Rows, inputs, running text |
+| `label` | 14 / 20 / 500 | Buttons, chips, metadata |
+| `caption` | 12 / 16 / 500 | Card eyebrows, field labels, status pills |
 
-Sizes follow the system text-size setting (Dynamic Type) and scale up to 200%.
+Spacing: `space-1…12` = `4 · 8 · 12 · 16 · 20 · 24 · 32 · 48`. Screen gutter `space-4`, card padding `space-5`, sheet padding `space-6`, `space-2` between stacked cards.
 
-Spacing (4-pt grid): `4 · 8 · 12 · 16 · 20 · 24 · 32`. Card padding 20, gap between cards 8, screen side margin 16.
+Shape: floating chrome is a pill (`radius-pill`: dock, top bar, chips, buttons, inputs, toast). Content is a rounded rectangle: `radius-md` 16 for rows and cards, `radius-lg` 24 for the deck cards, `radius-xl` 36 for sheets.
 
-Shape: radius `12` for cards and chips, `24` for containers and sheets, `999` (pill) for buttons, the tab bar and the energy pill. Icons are 1.5px outline, 16 and 20 px.
+Depth: surfaces are separated by lightness plus the `edge` top highlight, not drop shadows. `float` only on the dock and toast; `glow` only on the round add button.
 
-Touch targets are at least 44 × 44 pt. Contrast is at least 4.5:1 for text, which `text-2` on `surface-2` meets.
+Icons: 1.75px rounded line icons on a 24px grid, inheriting `currentColor`. No emoji: the check-in uses line-drawn mood faces with word labels.
+
+Focus and touch: a solid 2px `accent` ring with a 2px offset on every control; touch targets 44px or larger.
+
+Copy: sentence case, no exclamation marks or emoji, buttons named with a verb and an object ("Add task", "Save my day").
 
 ## Motion: a micro-animation for every interaction
 
@@ -171,7 +180,7 @@ How the drag feels:
 | Data writes | Update in memory first, write to IndexedDB in the background, never wait for it |
 | Lists | Render only visible rows when a list passes 100 items |
 
-How: Preact with signals (small, fine-grained updates), all data read into memory at start, a service worker that serves the app shell from cache, and no web fonts. Milestone 1 includes a Playwright test that fails if these budgets are broken.
+How: Preact with signals (small, fine-grained updates), all data read into memory at start, a service worker that serves the app shell from cache, and one self-hosted variable font that the service worker precaches. Milestone 1 includes a Playwright test that fails if these budgets are broken.
 
 ## Components
 

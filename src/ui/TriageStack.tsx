@@ -112,30 +112,30 @@ function Face({ t, editable, subtitle }: { t: Task; editable?: boolean; subtitle
   const project = t.projectId ? S.projects.value.find((p) => p.id === t.projectId) : undefined;
   return (
     <div class="dface front">
-      {subtitle && <p class="meta" style={{ margin: 0, color: 'inherit', opacity: 0.7 }}>{subtitle}</p>}
+      {subtitle && <p class="caption on-accent-muted" style={{ margin: 0 }}>{subtitle}</p>}
       <h2 class="dtitle" style={{ fontSize: 'var(--fs-title)' }}>{t.title}</h2>
       <div class="chips" style={{ marginTop: 'auto' }} data-noswipe={editable ? '' : undefined}>
         {editable ? (
           <>
-            <button type="button" class="chip press" style={{ background: 'rgba(0,0,0,.12)', color: 'inherit' }} onClick={cycleEnergy} aria-label="Change energy">
+            <button type="button" class="chip on-yellow press" onClick={cycleEnergy} aria-label="Change energy">
               <EnergyBars level={t.energy} /> {ENERGY_LABEL[t.energy]}{t.energySource === 'auto' ? ' ?' : ''}
             </button>
-            <button type="button" class="chip press" style={{ background: 'rgba(0,0,0,.12)', color: 'inherit' }} onClick={cycleTime} aria-label="Change time">
+            <button type="button" class="chip on-yellow press" onClick={cycleTime} aria-label="Change time">
               ~{formatMinutes(t.estimateMin)}{t.estimateSource === 'auto' ? ' ?' : ''}
             </button>
-            <button type="button" class="chip press" style={{ background: 'rgba(0,0,0,.12)', color: 'inherit' }} onClick={() => (editTaskId.value = t.id)}>
+            <button type="button" class="chip on-yellow press" onClick={() => (editTaskId.value = t.id)}>
               {project ? project.name : 'More…'}
             </button>
           </>
         ) : (
           <>
-            <span class="chip" style={{ background: 'rgba(0,0,0,.12)', color: 'inherit' }}><EnergyBars level={t.energy} /> {ENERGY_LABEL[t.energy]}</span>
-            <span class="chip" style={{ background: 'rgba(0,0,0,.12)', color: 'inherit' }}>~{formatMinutes(t.estimateMin)}</span>
-            {project && <span class="chip" style={{ background: 'rgba(0,0,0,.12)', color: 'inherit' }}>{project.name}</span>}
+            <span class="chip on-yellow"><EnergyBars level={t.energy} /> {ENERGY_LABEL[t.energy]}</span>
+            <span class="chip on-yellow">~{formatMinutes(t.estimateMin)}</span>
+            {project && <span class="chip on-yellow">{project.name}</span>}
           </>
         )}
       </div>
-      {editable && <p class="meta" style={{ margin: '8px 0 0', color: 'inherit', opacity: 0.6 }}>Tap a chip to correct the guess.</p>}
+      {editable && <p class="meta on-accent-muted" style={{ margin: '8px 0 0' }}>Tap a chip to correct the guess.</p>}
     </div>
   );
 }

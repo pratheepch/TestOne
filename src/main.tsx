@@ -1,4 +1,5 @@
 import { render } from 'preact';
+import '@fontsource-variable/instrument-sans/wght.css';
 import './styles/app.css';
 import { App } from './app';
 import { init } from './data/store';

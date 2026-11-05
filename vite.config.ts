@@ -27,7 +27,7 @@ export default defineConfig({
         ],
         shortcuts: [{ name: 'Add a task', short_name: 'Add', url: './?capture' }],
       },
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,png}'] },
+      workbox: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'] },
     }),
   ],
   test: { environment: 'node', include: ['src/**/*.test.ts'] },

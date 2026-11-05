@@ -91,6 +91,7 @@ export function Toast() {
   if (!t) return null;
   return (
     <div class="toast" key={t.id} role="status" aria-live="polite">
+      {t.text.startsWith('Done') && <span class="ok" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg></span>}
       <span>{t.text}</span>
       {t.undo && (
         <button type="button" onClick={() => { t.undo!.run(); hideToast(); }}>
@@ -114,7 +115,7 @@ export function Ring({ value, size = 40, stroke = 4, children }: { value: number
   return (
     <span class="ring-wrap" style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true" style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--surface-3)" stroke-width={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--surface-high)" stroke-width={stroke} />
         <circle class="ring-arc" cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--accent)" stroke-width={stroke}
           stroke-linecap="round" stroke-dasharray={c} stroke-dashoffset={c * (1 - v)} />
         {shown > 1 && (

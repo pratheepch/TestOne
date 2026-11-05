@@ -7,13 +7,14 @@ import * as S from '../data/store';
 import { pace } from './derived';
 import { checkInOpen } from './nav';
 import { Sheet } from './bits';
+import { IconMood } from './icons';
 
-const FACES: { mood: DayCheckIn['mood']; face: string; label: string }[] = [
-  { mood: 1, face: '😣', label: 'Rough' },
-  { mood: 2, face: '😕', label: 'Meh' },
-  { mood: 3, face: '😐', label: 'Okay' },
-  { mood: 4, face: '🙂', label: 'Good' },
-  { mood: 5, face: '😄', label: 'Great' },
+const FACES: { mood: DayCheckIn['mood']; label: string }[] = [
+  { mood: 1, label: 'Rough' },
+  { mood: 2, label: 'Meh' },
+  { mood: 3, label: 'Okay' },
+  { mood: 4, label: 'Good' },
+  { mood: 5, label: 'Great' },
 ];
 
 export function reflection(done: number, mood?: DayCheckIn['mood']): string {
@@ -42,9 +43,10 @@ export function CheckInSheet() {
       <div class="faces" role="radiogroup" aria-label="Mood">
         {FACES.map((f) => (
           <button type="button" key={f.mood} role="radio" aria-checked={mood === f.mood} aria-label={f.label}
-            class={`face${mood === f.mood ? ' on' : ''}`} onClick={() => setMood(f.mood)}>{f.face}</button>
+            class={`face press${mood === f.mood ? ' on' : ''}`} onClick={() => setMood(f.mood)}><IconMood mood={f.mood} /></button>
         ))}
       </div>
+      <div class="face-labels" aria-hidden="true">{FACES.map((f) => <span key={f.mood}>{f.label}</span>)}</div>
       <div class="field">
         <input class="input" placeholder="Anything to remember? (optional)" value={note} maxLength={140}
           onInput={(e) => setNote((e.target as HTMLInputElement).value)} />
@@ -57,7 +59,7 @@ export function CheckInSheet() {
             S.saveCheckIn(mood, note.trim() || undefined);
             setSaved(true);
             setTimeout(close, 1600);
-          }}>Save</button>
+          }}>Save my day</button>
         </div>
       ) : (
         <p class="meta" style={{ textAlign: 'center' }}>Saved. Rest well.</p>

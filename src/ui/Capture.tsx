@@ -84,7 +84,7 @@ export function CaptureSheet() {
         </div>
         <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
           <button type="button" class="btn btn-quiet press" style={{ flex: 1 }} onClick={close}>Close</button>
-          <button type="button" class="btn btn-primary press" style={{ flex: 2 }} disabled={!text.trim()} onClick={save}>Add</button>
+          <button type="button" class="btn btn-primary press" style={{ flex: 2 }} disabled={!text.trim()} onClick={save}>Add task</button>
         </div>
         {!!log.length && (
           <div class="capture-log" aria-live="polite">

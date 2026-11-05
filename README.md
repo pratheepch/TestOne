@@ -29,4 +29,4 @@ Your data lives in the browser's IndexedDB on that device. Use **Settings → Ex
 
 ## Tech
 
-Vite, TypeScript, Preact with signals, `idb`, `vite-plugin-pwa`. No backend, no analytics. Initial JavaScript is about 36 KB gzipped.
+Vite, TypeScript, Preact with signals, `idb`, `vite-plugin-pwa`. Design system: Companion Dark (Instrument Sans, bundled). No backend, no analytics. Initial JavaScript is about 36 KB gzipped.
