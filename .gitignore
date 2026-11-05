@@ -4,3 +4,4 @@ dev-dist
 e2e/out
 *.log
 todoflow-site.zip
+dist-e2e-sync

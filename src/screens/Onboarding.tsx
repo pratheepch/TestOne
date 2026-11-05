@@ -2,6 +2,8 @@ import { useState } from 'preact/hooks';
 import { curveFor, type Chronotype } from '../core/energy';
 import * as S from '../data/store';
 import { EnergyBars } from '../ui/bits';
+import { DropboxPanel } from '../ui/DropboxPanel';
+import { isConfigured } from '../sync';
 
 const LOGO = (
   <span class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" /></svg>TodoFlow</span>
@@ -9,6 +11,9 @@ const LOGO = (
 
 export function Onboarding() {
   const [step, setStep] = useState(0);
+  const [restore, setRestore] = useState(() => {
+    try { return !!localStorage.getItem('tf-dropbox-pending'); } catch { return false; }
+  });
   const pick = (c: Chronotype) => {
     S.updateSettings({ energyCurve: curveFor(c), onboarded: true });
     void navigator.storage?.persist?.();
@@ -20,7 +25,11 @@ export function Onboarding() {
         <h1>Do the right thing for the energy you have.</h1>
         <p>TodoFlow shows one task at a time, picked for your energy and time. No streaks, no guilt, and everything stays on this phone.</p>
         <div style={{ marginTop: 'auto' }}>
+          {restore && <DropboxPanel compact />}
           <button type="button" class="btn btn-primary btn-block press" style={{ minHeight: 56 }} onClick={() => setStep(1)}>Get started</button>
+          {isConfigured() && !restore && (
+            <button type="button" class="btn btn-ghost btn-block press" style={{ marginTop: 8 }} onClick={() => setRestore(true)}>Restore from Dropbox</button>
+          )}
         </div>
       </div>
     );

@@ -17,6 +17,7 @@ npm run dev        # http://localhost:5173  (add ?design for the component page)
 npm test           # unit tests (parser, estimates, ranking, Pace, repeats, store)
 npm run build      # production build in dist/
 npm run e2e        # end-to-end run on an emulated iPhone (needs a build); screenshots in e2e/out/
+node e2e/sync.mjs  # Dropbox sync end-to-end against a mocked Dropbox
 ```
 
 ## Put it on your iPhone
@@ -25,7 +26,7 @@ npm run e2e        # end-to-end run on an emulated iPhone (needs a build); scree
 2. Open it in Safari, tap **Share → Add to Home Screen**.
 3. It now opens full screen and works offline. Installing to the Home Screen also protects your data from Safari's storage clean-up.
 
-Your data lives in the browser's IndexedDB on that device. Use **Settings → Export** (or the last step of the weekly review) to save a backup to Files or iCloud Drive.
+Your data lives in the browser's IndexedDB on that device. Turn on **Settings → Sync with Dropbox** to keep it in your Dropbox automatically and restore it on another phone (setup: [`docs/SYNC.md`](docs/SYNC.md)). **Settings → Export** saves a one-off backup to Files or iCloud Drive.
 
 ## Tech
 

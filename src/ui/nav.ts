@@ -11,6 +11,8 @@ export const checkInOpen = signal(false);
 export const focus = signal<{ kind: 'task'; id: string } | { kind: 'break'; breakKind: string } | null>(null);
 export const listTab = signal<'next' | 'waiting' | 'someday' | 'projects' | 'done'>('next');
 export const projectFilter = signal<string | null>(null);
+/** A Dropbox sign-in code that came back to a browser that didn't start the sign-in. */
+export const orphanCode = signal<string | null>(null);
 
 export function go(r: Route): void {
   if (route.value === r) return;
@@ -27,7 +29,12 @@ export function initNav(): void {
   if (params.has('design') && import.meta.env.DEV) route.value = 'design';
   const h = location.hash.slice(1) as Route;
   if (['inbox', 'lists', 'pace', 'review', 'settings'].includes(h)) route.value = h;
-  if (params.size) history.replaceState(null, '', location.pathname + location.hash);
+  // Tidy the address bar, but leave a Dropbox sign-in reply for the sync module.
+  if (['capture', 'review', 'design'].some((k) => params.has(k))) {
+    for (const k of ['capture', 'review', 'design']) params.delete(k);
+    const q = params.toString();
+    history.replaceState(null, '', location.pathname + (q ? `?${q}` : '') + location.hash);
+  }
   addEventListener('popstate', (e) => {
     route.value = ((e.state as { r?: Route } | null)?.r ?? 'now');
   });

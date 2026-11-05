@@ -7,6 +7,7 @@ import { go, showToast } from '../ui/nav';
 import { Segmented, Stepper, Toggle } from '../ui/bits';
 import { pickFile } from '../ui/share';
 import { addReviewToCalendar, exportNow } from './Review';
+import { DropboxPanel } from '../ui/DropboxPanel';
 import { IconBack, IconCalendar, IconDownload, IconUpload } from '../ui/icons';
 
 const CYCLE: Record<Energy, Energy> = { low: 'med', med: 'high', high: 'low' };
@@ -77,8 +78,11 @@ export function SettingsScreen() {
         </>
       )}
 
+      <h2 class="section-label">Sync</h2>
+      <DropboxPanel />
+
       <h2 class="section-label">Your data</h2>
-      <p class="meta">Everything stays on this device. No account, no cloud{persisted === false ? '. Tip: add TodoFlow to your Home Screen so iOS keeps your data safe' : ''}.</p>
+      <p class="meta">Your data lives on this device{persisted === false ? '. Tip: add TodoFlow to your Home Screen so iOS keeps it safe' : ''}. Export saves a copy you control.</p>
       <div style={{ display: 'flex', gap: 8 }}>
         <button type="button" class="btn btn-primary press" style={{ flex: 1 }} onClick={() => void exportNow()}><IconDownload /> Export</button>
         <button type="button" class="btn btn-quiet press" style={{ flex: 1 }} onClick={async () => {

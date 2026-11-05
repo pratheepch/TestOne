@@ -1,6 +1,6 @@
 # TodoFlow — a GTD todo app that follows your energy
 
-Status: **v0.1 built** (see "What's built" at the end). Cloud sync comes next; the data layer is ready for it ([`SYNC.md`](SYNC.md)).
+Status: **v0.1 built** (see "What's built" at the end), plus Dropbox sync ([`SYNC.md`](SYNC.md)).
 
 ## Goals
 
@@ -318,5 +318,5 @@ Not yet built:
 - **On-device embedding model** for estimates. The estimator has the same interface, but uses word similarity for now. The model host (Hugging Face) couldn't be reached from the build environment, so this needs testing on a real device before shipping
 - Energy-curve learning ("Your curve has shifted") from when you actually finish high-energy work
 - Pull-down to reshuffle the deck (the deck already re-ranks itself when energy or time changes)
-- Cloud sync (next version)
+- Cloud sync: **Dropbox sync is built** (waiting for the Dropbox App key); iCloud would need a paid Apple Developer account
 

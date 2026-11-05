@@ -1,6 +1,8 @@
-# Cloud sync: what v1 already prepares
+# Sync
 
-Cloud sync is planned for the next version. v1 stays local-only, but the data layer is built so sync can be added without migrating anyone's data.
+TodoFlow works fully offline and keeps its data on the device. Dropbox sync is optional: turn it on and everything is also kept in your Dropbox, and comes back on another phone.
+
+## The groundwork in the data layer
 
 ## Already in place
 
@@ -15,12 +17,33 @@ Cloud sync is planned for the next version. v1 stays local-only, but the data la
 | **Device-only state kept apart** (energy override, time chip, check-in dismissal) | `DeviceState`, `device` store | Momentary state never syncs; settings do |
 | **Versioned export format** | `BackupFile` in `src/core/merge.ts` | Doubles as a full-snapshot payload |
 
-## What the next version adds
+## Dropbox sync (built)
 
-1. **Account and transport.** For example a small API or a hosted database with end-to-end encryption, so the server never sees task text.
-2. **Push:** read the outbox, upload the current version of each changed record, clear entries on success.
-3. **Pull:** fetch records changed since the last sync cursor, run `mergeRecords`, write the winners with `save(..., false)` so they keep their original stamps.
-4. **Field-level merge (optional).** Record-level last-writer-wins is fine for one person on two devices. If edits often collide, merge per field using per-field timestamps.
-5. **Settings to sync:** `Settings` already carries `SyncMeta`; `DeviceState` stays local.
+Turn on **Settings → Sync → Sync with Dropbox** (or **Restore from Dropbox** on the first screen of a new install).
 
-Until then, **Export / Import** moves data between devices, using the same merge rules.
+- **Where:** one file, `Apps/TodoFlow/todoflow.json` in the person's own Dropbox, in the same format as Export. The app can only see its own folder.
+- **Sign-in:** OAuth 2 with PKCE straight from the browser (`src/sync/dropbox.ts`). No server and no secret; the refresh token stays in this device's IndexedDB and is never synced. If iOS returns the sign-in to a different browser than the Home Screen app, that page shows a code to paste back into the app.
+- **A sync round** (`src/sync/engine.ts`): download the file, merge it in with the record rules above, and upload only if this device has something the file doesn't. The upload only succeeds if the file is still at the version that was read (Dropbox `rev`); if another device saved in between, the round starts again, so nothing is overwritten.
+- **When it runs** (`src/sync/index.ts`): on opening the app, 3 seconds after a change, when the app goes to the background with changes waiting, and when the phone comes back online. Merging in remote changes never counts as a local change, so sync doesn't loop.
+- **A fresh install** that restores takes the existing account's settings and skips setup.
+- **Safety:** a damaged or foreign file in Dropbox is never overwritten; the app stops and says so.
+- **Turning it off** revokes the token. Data stays on the phone and in Dropbox.
+
+### Setup (one time)
+
+1. dropbox.com/developers/apps → **Create app** → **Scoped access** → **App folder** → name it TodoFlow.
+2. **Permissions:** tick `files.content.read` and `files.content.write`, then Submit.
+3. **Settings → OAuth 2 → Redirect URIs:** add `https://pratheepch.github.io/TestOne/` (and `http://localhost:5173/` for development).
+4. Put the **App key** in `src/sync/config.ts` (it is public by design), or set `VITE_DROPBOX_APP_KEY` at build time.
+
+Until the key is set, Settings says sync isn't switched on yet and everything else works as before.
+
+### Tests
+
+- `src/sync/sync.test.ts`: two simulated phones through a fake Dropbox (first upload, restore, newest edit wins, conflict retry, damaged files), the HTTP client against a fake network (missing file, rev header, conflict, token refresh), and PKCE against Node's crypto.
+- `e2e/sync.mjs`: the real app in an emulated iPhone with Dropbox mocked at the network level: sign-in round trip, auto-upload, restore on a second phone during setup, changes flowing back, and the paste-code page.
+
+## Later
+
+- iCloud (CloudKit JS) as a second option. It needs a paid Apple Developer account.
+- Field-level merge, if edits often collide.

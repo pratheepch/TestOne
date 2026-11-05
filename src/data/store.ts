@@ -21,6 +21,9 @@ export const breaks = signal<BreakLog[]>([]);
 export const settings = signal<Settings>(defaultSettings('pending', 0));
 export const device = signal<DeviceState>({});
 export const ready = signal(false);
+/** Increments on every local change (not on changes merged in from sync). */
+export const localChanges = signal(0);
+let applyingRemote = false;
 /** Ticks every 30 s so time-based views stay fresh. */
 export const now = signal(Date.now());
 
@@ -69,6 +72,7 @@ function save<T extends SyncMeta>(collection: CollectionName, record: T, stamp =
     sig.value = i === -1 ? [...list, r] : list.map((x, j) => (j === i ? r : x));
   }
   queueWrite(collection, r);
+  if (!applyingRemote) localChanges.value++;
   return r;
 }
 
@@ -294,6 +298,11 @@ export function logBreak(kind: string, minutes: number, startedAt: number): void
 // ---------- Backup ----------
 export function exportBackup(): BackupFile {
   updateSettings({ lastExportAt: Date.now() });
+  return snapshot();
+}
+
+/** Everything, in the backup / sync file format. */
+export function snapshot(): BackupFile {
   return {
     app: BACKUP_APP,
     version: BACKUP_VERSION,
@@ -307,15 +316,52 @@ export function exportBackup(): BackupFile {
 
 export function importBackup(json: unknown): { added: number } {
   if (!isBackupFile(json)) throw new Error("This doesn't look like a TodoFlow backup.");
+  return { added: mergeIn(json) };
+}
+
+/**
+ * Merge a file from sync into local data. Changes it brings in don't count as
+ * local changes, so they don't trigger another upload.
+ */
+export function applyRemote(json: BackupFile): number {
+  applyingRemote = true;
+  try {
+    return mergeIn(json);
+  } finally {
+    applyingRemote = false;
+  }
+}
+
+function mergeIn(json: BackupFile): number {
   let added = 0;
   for (const c of ['tasks', 'projects', 'checkins', 'breaks', 'settings'] as CollectionName[]) {
-    const incoming = json.data[c];
+    let incoming = json.data[c];
     if (!incoming?.length) continue;
+    // A fresh, not-yet-set-up device takes the settings of an existing account.
+    if (c === 'settings' && !settings.value.onboarded && (incoming[0] as Settings).onboarded) {
+      save('settings', { ...(incoming[0] as Settings), id: settings.value.id }, false);
+      added++;
+      continue;
+    }
+    if (c === 'settings') incoming = incoming.map((r) => ({ ...r, id: settings.value.id }));
     const { changed } = mergeRecords(SIGNALS[c].value, incoming);
     for (const r of changed) save(c, r, false);
     added += changed.length;
   }
-  return { added };
+  return added;
+}
+
+/** True when local data has something the given file doesn't. */
+export function differsFrom(json: BackupFile | null): boolean {
+  if (!json) return true;
+  for (const c of ['tasks', 'projects', 'checkins', 'breaks', 'settings'] as CollectionName[]) {
+    const remote = new Map((json.data[c] ?? []).map((r) => [c === 'settings' ? 'settings' : r.id, r]));
+    for (const r of SIGNALS[c].value) {
+      const o = remote.get(c === 'settings' ? 'settings' : r.id);
+      if (!o || o.updatedAt !== r.updatedAt || o.rev !== r.rev) return true;
+    }
+  }
+  return false;
 }
 
 export async function eraseAll(): Promise<void> {

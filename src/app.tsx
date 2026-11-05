@@ -11,7 +11,8 @@ import { CheckInSheet } from './ui/CheckIn';
 import { FocusView } from './ui/Focus';
 import { Toast } from './ui/bits';
 import { IconInbox, IconList, IconNow, IconPlus } from './ui/icons';
-import { focus } from './ui/nav';
+import { focus, orphanCode } from './ui/nav';
+import { CodeScreen } from './ui/CodeScreen';
 
 // Less-used screens load on demand to keep the first load small.
 function lazy(load: () => Promise<ComponentType>): ComponentType {
@@ -42,6 +43,7 @@ const SCREENS: Record<Route, ComponentType> = {
 };
 
 export function App() {
+  if (orphanCode.value) return <div class="app"><CodeScreen /></div>;
   if (!S.ready.value) return null;
   if (!S.settings.value.onboarded) return <div class="app"><Onboarding /></div>;
   const r = route.value;
