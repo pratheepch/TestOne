@@ -76,7 +76,7 @@ export function FocusView() {
       <div class="focus-line" style={{ height: `${pct * 100}%` }} />
       <span class="meta">Break · {idea.minutes} min</span>
       <h1 class="focus-title">{idea.title}</h1>
-      <p class="kind" style={{ color: 'var(--text-2)' }}>{idea.detail}</p>
+      <p class="kind" style={{ color: 'var(--ink-muted)' }}>{idea.detail}</p>
       {idea.kind === 'breathe' && <Breather elapsed={elapsed} />}
       <div class="focus-time">{mmss(left)}</div>
       <div class="focus-actions">

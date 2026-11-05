@@ -328,7 +328,7 @@ function Front({ item, onPassReset }: { item: Item; onPassReset?: () => void }) 
         <div class="deck-empty">
           <h2>That's the best of what fits.</h2>
           <p class="meta">Flicking through more rarely helps. Pick one, or look at everything.</p>
-          <button type="button" class="btn btn-quiet press" style={{ background: 'rgba(0,0,0,.12)', color: 'inherit' }} onClick={() => { listTab.value = 'next'; go('lists'); }}>Show the full list</button>
+          <button type="button" class="btn on-yellow press" onClick={() => { listTab.value = 'next'; go('lists'); }}>Show the full list</button>
           <button type="button" class="btn btn-ghost press" style={{ color: 'inherit' }} onClick={onPassReset}>Go through again</button>
         </div>
       </div>
@@ -339,8 +339,8 @@ function Front({ item, onPassReset }: { item: Item; onPassReset?: () => void }) 
       <div class="dface front">
         <div class="deck-empty">
           <h2>All clear for your energy right now.</h2>
-          <p class="meta" style={{ color: 'inherit', opacity: 0.7 }}>Nothing is waiting for you today.</p>
-          <button type="button" class="btn btn-quiet press" style={{ background: 'rgba(0,0,0,.12)', color: 'inherit' }} onClick={() => { listTab.value = 'next'; go('lists'); }}>Show everything</button>
+          <p class="meta on-accent-muted">Nothing is waiting for you today.</p>
+          <button type="button" class="btn on-yellow press" onClick={() => { listTab.value = 'next'; go('lists'); }}>Show everything</button>
         </div>
       </div>
     );
@@ -349,7 +349,7 @@ function Front({ item, onPassReset }: { item: Item; onPassReset?: () => void }) 
     <div class="dface front">
       <div class="deck-empty">
         <h2>What's on your mind?</h2>
-        <p style={{ opacity: 0.7, margin: 0 }}>Add a task. TodoFlow guesses the time and energy it needs, then shows it here when it fits.</p>
+        <p class="on-accent-muted" style={{ margin: 0 }}>Add a task. TodoFlow guesses the time and energy it needs, then shows it here when it fits.</p>
         <button type="button" class="btn press" style={{ background: 'var(--on-accent)', color: 'var(--accent)' }} onClick={() => (captureOpen.value = true)}>Add a task</button>
       </div>
     </div>

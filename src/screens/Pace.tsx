@@ -113,9 +113,9 @@ function WeekChart({ series, base }: { series: PacePoint[]; base: number }) {
             <text x={PAD.l + i * bw + bw / 2} y={H - 4} text-anchor="middle">{fromDateKey(p.date).toLocaleDateString(undefined, { weekday: 'narrow' })}</text>
           </g>
         ))}
-        {base > 0 && <line x1={PAD.l} x2={W - PAD.r} y1={y(base)} y2={y(base)} stroke="var(--text-2)" stroke-dasharray="4 4" />}
+        {base > 0 && <line x1={PAD.l} x2={W - PAD.r} y1={y(base)} y2={y(base)} stroke="var(--ink-muted)" stroke-dasharray="4 4" />}
       </svg>
-      <figcaption class="legend"><span><i style={{ background: 'var(--accent)' }} />Effort</span><span><i style={{ background: 'var(--text-2)' }} />Your Base</span></figcaption>
+      <figcaption class="legend"><span><i style={{ background: 'var(--accent)' }} />Effort</span><span><i style={{ background: 'var(--ink-muted)' }} />Your Base</span></figcaption>
     </figure>
   );
 }
@@ -134,17 +134,17 @@ function MonthChart({ series, steadyLow, steadyHigh }: { series: PacePoint[]; st
         <path d={band} fill="var(--accent)" opacity="0.08" />
         {series.map((p, i) => (
           <rect class="bar" key={p.date} x={x(i) - step / 2 + 1} width={step - 2} y={y(p.effort)} height={Math.max(0, H - PAD.b - y(p.effort))} rx="1.5"
-            fill="var(--text-3)" style={{ animationDelay: `${i * 10}ms` }} />
+            fill="var(--ink-faint)" style={{ animationDelay: `${i * 10}ms` }} />
         ))}
-        <path d={line('base')} fill="none" stroke="var(--text-2)" stroke-width="1.5" stroke-dasharray="4 4" />
+        <path d={line('base')} fill="none" stroke="var(--ink-muted)" stroke-width="1.5" stroke-dasharray="4 4" />
         <path d={line('recent')} fill="none" stroke="var(--accent)" stroke-width="2" />
         <text x={PAD.l} y={H - 4}>{shortLabel(series[0].date)}</text>
         <text x={W - PAD.r} y={H - 4} text-anchor="end">Today</text>
       </svg>
       <figcaption class="legend">
         <span><i style={{ background: 'var(--accent)' }} />Recent</span>
-        <span><i style={{ background: 'var(--text-2)' }} />Base</span>
-        <span><i style={{ background: 'rgba(255,243,54,.25)', height: 8 }} />Steady zone</span>
+        <span><i style={{ background: 'var(--ink-muted)' }} />Base</span>
+        <span><i style={{ background: 'var(--accent-soft)', height: 8 }} />Steady zone</span>
       </figcaption>
     </figure>
   );

@@ -1,11 +1,11 @@
-// 1.5px outline icons, 20px by default.
+// Companion Dark icons: 1.75px rounded line icons on a 24px grid, inheriting currentColor.
 import type { JSX } from 'preact';
 
 type P = { size?: number } & JSX.SVGAttributes<SVGSVGElement>;
 
 const base = (size = 20) => ({
   width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor',
-  'stroke-width': 1.5, 'stroke-linecap': 'round' as const, 'stroke-linejoin': 'round' as const, 'aria-hidden': true,
+  'stroke-width': 1.75, 'stroke-linecap': 'round' as const, 'stroke-linejoin': 'round' as const, 'aria-hidden': true,
 });
 
 export const IconCheck = ({ size, ...p }: P) => <svg {...base(size)} {...p}><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>;
@@ -29,6 +29,16 @@ export const IconTrash = ({ size, ...p }: P) => <svg {...base(size)} {...p}><pat
 export const IconSpark = ({ size, ...p }: P) => <svg {...base(size)} {...p}><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" /></svg>;
 export const IconWait = ({ size, ...p }: P) => <svg {...base(size)} {...p}><path d="M7 4h10M7 20h10M8 4c0 5 8 5 8 8s-8 3-8 8M16 4c0 5-8 5-8 8" /></svg>;
 export const IconArchive = ({ size, ...p }: P) => <svg {...base(size)} {...p}><rect x="3.5" y="4" width="17" height="4.5" rx="1.5" /><path d="M5 8.5V19a1 1 0 001 1h12a1 1 0 001-1V8.5M10 12.5h4" /></svg>;
+
+/** Mood faces for the end-of-day check-in (line icons, not emoji). 1 = rough … 5 = great. */
+const MOUTHS = ['M8.5 16.5c1.6-2 5.4-2 7 0', 'M9 16c1.3-1 4.7-1 6 0', 'M9 15.5h6', 'M9 14.5c1.3 1.2 4.7 1.2 6 0', 'M8 14c1.5 2.6 6.5 2.6 8 0'];
+export const IconMood = ({ mood, size = 28 }: { mood: 1 | 2 | 3 | 4 | 5; size?: number }) => (
+  <svg {...base(size)}>
+    <circle cx="12" cy="12" r="9" />
+    {mood === 1 ? <path d="M8 9.5l2 1-2 1M16 9.5l-2 1 2 1" /> : <><path d="M9 10v.5" /><path d="M15 10v.5" /></>}
+    <path d={MOUTHS[mood - 1]} />
+  </svg>
+);
 
 /** Animated tick used when completing. */
 export const Tick = () => (

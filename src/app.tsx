@@ -63,18 +63,18 @@ function TabBar() {
   const r = route.value;
   const inbox = S.inboxTasks.value.length;
   const tab = (to: Route, label: string, icon: preact.ComponentChildren, badge?: number) => (
-    <button type="button" class="tab press" aria-current={r === to ? 'page' : undefined} onClick={() => go(to)}>
+    <button type="button" class="tab press" aria-current={r === to ? 'page' : undefined} aria-label={badge ? `${label}, ${badge} waiting` : label} onClick={() => go(to)}>
       {icon}
-      <span>{label}</span>
-      {!!badge && <span class="badge" aria-label={`${badge} in Inbox`}>{badge > 99 ? '99+' : badge}</span>}
-      <span class="tab-dot" />
+      {!!badge && <span class="badge" aria-hidden="true">{badge > 99 ? '99+' : badge}</span>}
     </button>
   );
   return (
     <nav class="tabbar" aria-label="Main">
-      {tab('now', 'Now', <IconNow />)}
-      {tab('inbox', 'Inbox', <IconInbox />, inbox)}
-      {tab('lists', 'Lists', <IconList />)}
+      <div class="dock-nav">
+        {tab('now', 'Now', <IconNow size={22} />)}
+        {tab('inbox', 'Inbox', <IconInbox size={22} />, inbox)}
+        {tab('lists', 'Lists', <IconList size={22} />)}
+      </div>
       <button type="button" class={`fab${captureOpen.value ? ' open' : ''}`} aria-label={captureOpen.value ? 'Close' : 'Add a task'}
         onClick={() => (captureOpen.value ? (captureOpen.value = false) : openCapture())}>
         <IconPlus size={26} />
