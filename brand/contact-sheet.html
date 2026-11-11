@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experience Pixels Logo Concepts</title>
+<style>
+  :root { --ink: #000; --paper: #fff; --rule: #ddd; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.4 Inter, system-ui, sans-serif; padding: 32px 16px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.sub { margin: 0 0 32px; color: #555; }
+  .concept { display: grid; grid-template-columns: 1fr; gap: 16px; padding: 24px 0; border-top: 1px solid var(--rule); }
+  .concept h2 { font-size: 15px; margin: 0; }
+  .concept .meta { color: #555; margin: 2px 0 0; }
+  .row { display: flex; align-items: flex-end; gap: 40px; flex-wrap: wrap; }
+  .big img { height: 180px; }
+  .wordmark .big img { height: 120px; }
+  .sizes { display: flex; align-items: flex-end; gap: 28px; }
+  .sizes figure { margin: 0; text-align: center; }
+  .sizes figcaption { font-size: 11px; color: #777; margin-top: 8px; }
+  img { display: block; image-rendering: auto; }
+  .dark { background: #000; padding: 12px; }
+</style>
+</head>
+<body>
+<h1>Experience Pixels, logo concept exploration</h1>
+<p class="sub">Phase 2. Pure #000 on #FFF. Each mark shown large, then at 64, 32 and 16 px to check favicon survival.</p>
+
+<section class="concept wordmark">
+  <div><h2>Concept 1, Double X wordmark</h2><p class="meta">Inter SemiBold outlines, both x glyphs built from nine stem-width squares on a 5x5 pixel grid, square i-dots.</p></div>
+  <div class="row">
+    <div class="big"><img src="concept-1-wordmark.svg" alt=""></div>
+    <div class="sizes">
+      <figure><img src="concept-1-wordmark.svg" style="height:64px"><figcaption>64 px tall</figcaption></figure>
+      <figure><img src="concept-1-wordmark.svg" style="height:32px"><figcaption>32 px tall</figcaption></figure>
+      <figure><img src="concept-1-wordmark.svg" style="height:16px"><figcaption>16 px tall</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="concept">
+  <div><h2>Concept 2, Shared Stem monogram</h2><p class="meta">E and P on a 7x5 grid, the E bars run into the P stem. The P counter is the single pixel.</p></div>
+  <div class="row">
+    <div class="big"><img src="concept-2-monogram.svg" alt=""></div>
+    <div class="sizes">
+      <figure><img src="concept-2-monogram.svg" width="64" height="64"><figcaption>64 px</figcaption></figure>
+      <figure><img src="concept-2-monogram.svg" width="32" height="32"><figcaption>32 px</figcaption></figure>
+      <figure><img src="concept-2-monogram.svg" width="16" height="16"><figcaption>16 px</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="concept">
+  <div><h2>Concept 3, The Escaped Pixel</h2><p class="meta">3x3 pixel block, top-right pixel lifted one pitch out of the grid.</p></div>
+  <div class="row">
+    <div class="big"><img src="concept-3-escaped-pixel.svg" alt=""></div>
+    <div class="sizes">
+      <figure><img src="concept-3-escaped-pixel.svg" width="64" height="64"><figcaption>64 px</figcaption></figure>
+      <figure><img src="concept-3-escaped-pixel.svg" width="32" height="32"><figcaption>32 px</figcaption></figure>
+      <figure><img src="concept-3-escaped-pixel.svg" width="16" height="16"><figcaption>16 px</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="concept">
+  <div><h2>Concept 4, Aliased Arc</h2><p class="meta">Smooth outer quarter circle, three-step staircase inside. Raster meets vector.</p></div>
+  <div class="row">
+    <div class="big"><img src="concept-4-aliased-arc.svg" alt=""></div>
+    <div class="sizes">
+      <figure><img src="concept-4-aliased-arc.svg" width="64" height="64"><figcaption>64 px</figcaption></figure>
+      <figure><img src="concept-4-aliased-arc.svg" width="32" height="32"><figcaption>32 px</figcaption></figure>
+      <figure><img src="concept-4-aliased-arc.svg" width="16" height="16"><figcaption>16 px</figcaption></figure>
+    </div>
+  </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="140" height="140">
+  <title>Experience Pixels - Concept 4 - Aliased Arc</title>
+  <rect width="140" height="140" fill="#FFFFFF"/>
+  <g fill="#000000">
+    <path d="M20 120A100 100 0 0 1 120 20L120 60L100 60L100 80L80 80L80 100L60 100L60 120Z"/>
+  </g>
+</svg>
